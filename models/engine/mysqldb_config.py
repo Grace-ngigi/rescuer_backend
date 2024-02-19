@@ -55,7 +55,25 @@ class MysqlConfig:
             self.__session.delete(obj)
 
     def close(self):
-        self.__session.remove()    
+        self.__session.remove()  
+
+    def find_one(self, model, condition):
+        ''' find one by condition '''  
+        return self.__session.query(model).filter(condition).first() 
+
+    def find_many(self, model, condition):
+        return self.__session.query(model).filter(condition)
+
+    def get(self, cls, id):
+        ''' return object based on class name and id '''
+        if cls not in classes.values():
+            return None
+        
+        all_classes = self.all(cls)
+        for value in all_classes.values():
+            if value.id == id:
+                return value
+        return None
 
     def get_session(self):
         return self.__session
