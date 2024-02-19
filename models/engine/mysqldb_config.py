@@ -30,5 +30,32 @@ class MysqlConfig:
         self.__session = Session
         print("tables created...")
 
+    def all(self, cls=None):
+        'return all records in a certain class'
+        new_dict  ={}
+        for i in classes:
+            if cls is None or cls is classes[i] or cls is i:
+                objs = self.__session.query(classes[i]).all()
+                for obj in objs:
+                    key = obj.__class__.__name__ + '.' + obj.id
+                    new_dict[key] = obj
+        return new_dict
+    
+    def new(self, obj):
+        ''' add object to current session '''
+        self.__session.add(obj)
+
+    def save(self):
+        ''' commit changes to current session '''
+        self.__session.commit()
+
+    def delete(self, obj=None):
+        ''' delete '''
+        if obj is not None:
+            self.__session.delete(obj)
+
+    def close(self):
+        self.__session.remove()    
+
     def get_session(self):
         return self.__session
