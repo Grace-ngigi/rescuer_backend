@@ -13,6 +13,8 @@ class User(BaseModel):
     password = Column(String(128))
     role = Column(String(60))
 
+    rescues = relationship("Rescue", back_populates="user")
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         

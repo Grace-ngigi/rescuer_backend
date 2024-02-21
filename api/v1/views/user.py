@@ -107,7 +107,7 @@ def get_users():
 
     users = db.all(User).values()
     users_list = [user.__custom_dict__() for user in users]
-    return jsonify(users_list)
+    return jsonify(users_list),200
 
 @app_views.route("/profile", methods=['GET'], strict_slashes=False)
 @jwt_required()

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ''' entry point '''
-from flask import Flask
+from flask import Flask, make_response, jsonify
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from api.v1.views import app_views
 
@@ -12,6 +12,22 @@ app.config['JWT_SECRET_KEY'] = 'awesomeamazement'
 jwt = JWTManager(app)
 
 CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': "Not Found", 'message': error.description}), 404)
+
+@app.errorhandler(403)
+def forbidden(error):
+    return make_response(jsonify({'error': "Forbidden", 'message': error.description}), 403)
+
+@app.errorhandler(401)
+def unauthorized(error):
+    return make_response(jsonify({'error': "Unauthorized", 'message': error.description}), 401)
+
+@app.errorhandler(500)
+def server_error(error):
+    return make_response(jsonify({'error': "Internal Server Error", 'message': error.description}), 500)
 app.register_blueprint(app_views)
 
 if __name__ == '__main__':
