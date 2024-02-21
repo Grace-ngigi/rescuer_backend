@@ -3,10 +3,11 @@
 
 from models.rescue import Rescue
 from api.v1.views import app_views
+from models.rescue import RescueStatus
 from models.engine.mysqldb_config import MysqlConfig 
 from datetime import datetime
 from flask import request, abort, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 db = MysqlConfig()
 db.reload()
@@ -18,7 +19,6 @@ def add_rescue():
     current_user = get_jwt_identity()
     if not current_user:
         abort(401, "Unauthorized")
-    print(current_user['email'])    
 
     ''' create a rescue '''
     if not request.get_json():
@@ -40,7 +40,8 @@ def add_rescue():
         age=data['age'],
         description=data['description'],
         image_url=data['image_url'],
-        user_id=current_user['id']
+        user_id=current_user['id'],
+        status = RescueStatus.RESCUED.value
         )
     rescue.created_at = datetime.utcnow()
     rescue.created_by = current_user['id']
@@ -99,8 +100,11 @@ def update_rescue(rescue_id):
     current_user = get_jwt_identity()
     if not current_user:
         abort(401, description="Unauthorized")
+
+    if current_user.get('role') != 'ADMIN':
+        abort(403, description="Admin privileges required")
     
-    rescue = db.find_one(Rescue, Rescue.id == rescue_id and Rescue.user_id == current_user['id'])
+    rescue = db.find_one(Rescue, Rescue.id == rescue_id)
     if not rescue:
         abort(400, description = "rescue not Found")
     if not request.get_json():

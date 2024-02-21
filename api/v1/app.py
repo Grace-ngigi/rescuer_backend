@@ -9,6 +9,9 @@ from flask_cors import (CORS, cross_origin)
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'awesomeamazement'
+# Token expires in 24 hours
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 24 * 60
+
 jwt = JWTManager(app)
 
 CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
@@ -24,6 +27,10 @@ def forbidden(error):
 @app.errorhandler(401)
 def unauthorized(error):
     return make_response(jsonify({'error': "Unauthorized", 'message': error.description}), 401)
+
+@app.errorhandler(400)
+def bad_request(error):
+    return make_response(jsonify({'error': "Bad Request", 'message': error.description}), 400)
 
 @app.errorhandler(500)
 def server_error(error):

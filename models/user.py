@@ -14,6 +14,7 @@ class User(BaseModel):
     role = Column(String(60))
 
     rescues = relationship("Rescue", back_populates="user")
+    adopt = relationship("Adopt", back_populates='user')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

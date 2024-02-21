@@ -2,13 +2,18 @@
 ''' MySQL DB configuration '''
 from models.user import User
 from models.rescue import Rescue
+from models.adopt import Adopt
 from models.base_model import Base
 import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-classes = {"User": User, "Rescue": Rescue}
+classes = {
+    "User": User, 
+    "Rescue": Rescue, 
+    "Adopt": Adopt
+    }
 
 
 class MysqlConfig:

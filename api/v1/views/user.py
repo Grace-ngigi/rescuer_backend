@@ -91,7 +91,8 @@ def login() -> str:
         'access_token': token,
         'user': {
             'email': user.email,
-            'phone': user.phone
+            'phone': user.phone,
+            'role':user.role
         }
     }), 200
 
