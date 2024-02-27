@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 ''' adopts '''
 from models.adopt import Adopt
+from models.rescue import Rescue, RescueStatus
 from api.v1.views import app_views
 from models.adopt import AdoptStatus
 from models.engine.mysqldb_config import MysqlConfig 
@@ -17,22 +18,33 @@ def adopt():
     ''' create a request '''
     current_user = get_jwt_identity()
     if not current_user:
-        abort(401, "Unauthorized")
+        abort(401, description = "Unauthorized")
 
     if 'rescue_id' not in request.args:
-        abort(401, description = 'Missing Request Id')
+        abort(400, description = 'Missing Request Id')
+
+    rescue_id = request.args.get('rescue_id')
 
     adopt = Adopt(
         user_id=current_user['id'],
-        rescue_id=request.args.get('rescue_id'),
+        rescue_id=rescue_id,
         status=AdoptStatus.INIT.value
     )
     adopt.created_at = datetime.utcnow()
     adopt.created_by = current_user['id']
+    try:
+        db.new(adopt)
+    except Exception as e:
+        db.rollback()
+        abort(500, decription = f"Failed to create adoption: {str(e)}")
 
-    db.new(adopt)
-    db.save()
-
+    rescue = db.find_one(Rescue, Rescue.id == rescue_id)
+    if rescue:
+        rescue.status = RescueStatus.ADOPTED.value
+        db.save()
+    else:
+        abort(404, description="Rescue not found")
+        
     return jsonify(adopt.__custom_dict__()), 201
 
 @app_views.route("/adopt/<string:adopt_id>", methods=["GET"], strict_slashes=False)
@@ -75,7 +87,6 @@ def get_adopts():
     adopts = db.all(Adopt).values()
     adopts_list = [adopt.__custom_dict__() for adopt in adopts]
     return jsonify(adopts_list), 200
-
 
 @app_views.route("/adopt/<string:adopt_id>", methods=['PUT'], strict_slashes=False)
 @jwt_required()

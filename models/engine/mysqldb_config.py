@@ -61,7 +61,10 @@ class MysqlConfig:
             self.__session.delete(obj)
 
     def close(self):
-        self.__session.remove()  
+        self.__session.remove()
+
+    def rollback(self):
+        self.__session.rollback()
 
     def find_one(self, model, condition):
         ''' find one by condition '''  

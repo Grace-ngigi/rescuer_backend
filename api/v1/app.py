@@ -16,6 +16,10 @@ jwt = JWTManager(app)
 
 CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 
+@app.errorhandler(405)
+def not_found(error):
+    return make_response(jsonify({'error': "Method Not Allowed", 'message': error.message}), 405)
+
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': "Not Found", 'message': error.description}), 404)

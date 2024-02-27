@@ -41,6 +41,7 @@ def add_rescue():
         description=data['description'],
         image_url=data['image_url'],
         user_id=current_user['id'],
+        location=data['location'],
         status = RescueStatus.RESCUED.value
         )
     rescue.created_at = datetime.utcnow()
@@ -66,7 +67,7 @@ def get_rescue(rescue_id):
     return jsonify(rescue.__custom_dict__()), 200
 
 
-@app_views.route("user/rescues", methods=["GET"], strict_slashes=False)
+@app_views.route("/user/rescues", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def get_user_rescues():
     ''' find all rescues '''
@@ -75,6 +76,18 @@ def get_user_rescues():
         abort(401, description="Unauthorized")
 
     rescues = db.find_many(Rescue, Rescue.user_id == current_user['id'])
+    rescues_list = [rescue.__custom_dict__()  for rescue in rescues]
+    return jsonify(rescues_list), 200
+
+
+@app_views.route("/ready/rescues", methods=['GET'], strict_slashes=False)
+@jwt_required()
+def get_ready_rescues():
+    current_user = get_jwt_identity()
+    if not current_user:
+        abort(401, description="Unauthorized")
+        
+    rescues = db.find_many(Rescue, Rescue.status == RescueStatus.READY.value)
     rescues_list = [rescue.__custom_dict__()  for rescue in rescues]
     return jsonify(rescues_list), 200
 

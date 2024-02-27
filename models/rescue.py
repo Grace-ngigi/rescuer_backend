@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ''' Rescues '''
-from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy import Column, String, Integer, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from models.base_model import BaseModel
 from enum import Enum
@@ -17,7 +17,7 @@ class Rescue(BaseModel):
     species = Column(String(128))
     age = Column(Integer)
     decription = Column(String(255))
-    image_url = Column(String(255))
+    image_url = Column(Text)
     location = Column(String(128))
     vet_evaluation = Column(String(255))
     status = Column(String(128))

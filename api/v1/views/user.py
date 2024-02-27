@@ -16,8 +16,8 @@ db.reload()
 @app_views.route('/register', methods=['POST'], strict_slashes=False)
 def register() -> str:
     ''' Register new User'''
-    if not request.get_json():
-        abort(400, description="Not a JSON")
+    # if not request.get_json():
+    #     abort(400, description="Not a JSON")
     data = request.get_json() 
     if 'email' not in data:
         abort(400, description='Missing Email')
@@ -26,9 +26,10 @@ def register() -> str:
     if 'password' not in data:
         abort(400, description="Missing password")
 
-    user = db.find_one(User, User.email)
-    if user:
-        return jsonify(409, description='Email already exists')
+    existing_user = db.find_one(User, User.email== data['email'])
+    print(existing_user)
+    if existing_user:
+        return abort(400, description='Email already exists')
     
     hashed_password = generate_password_hash(data['password']).decode('utf-8')
     user = User(email=data['email'],
