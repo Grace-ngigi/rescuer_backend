@@ -25,6 +25,10 @@ def adopt():
 
     rescue_id = request.args.get('rescue_id')
 
+    existing_request_id = db.find_one(Adopt, Adopt.rescue_id == rescue_id)
+    if existing_request_id:
+        abort(400, description="Rescue Id already exists")
+
     adopt = Adopt(
         user_id=current_user['id'],
         rescue_id=rescue_id,
@@ -44,7 +48,7 @@ def adopt():
         db.save()
     else:
         abort(404, description="Rescue not found")
-        
+
     return jsonify(adopt.__custom_dict__()), 201
 
 @app_views.route("/adopt/<string:adopt_id>", methods=["GET"], strict_slashes=False)
@@ -70,8 +74,18 @@ def get_user_adopts():
         abort(401, description="Unauthorized")
 
     adopts = db.find_many(Adopt, Adopt.user_id == current_user['id'])
-    adopts_list = [adopt.__custom_dict__()  for adopt in adopts]
-    return jsonify(adopts_list), 200
+    # adopts_list = [adopt.__custom_dict__() for adopt in adopts]
+
+    # Retrieve rescues for each adopt
+    rescues_list = []
+    for adopt in adopts:
+        rescue_id = adopt.rescue_id  # Access rescue_id directly
+        rescue = db.find_one(Rescue, Rescue.user_id == current_user['id'] and Rescue.id == rescue_id)
+    if rescue:
+        rescues_list.append(rescue.__custom_dict__())
+
+    return jsonify(rescues_list), 200
+
 
 
 @app_views.route("/adopts", methods=['GET'], strict_slashes=False)

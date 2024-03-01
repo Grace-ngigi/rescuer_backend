@@ -18,6 +18,8 @@ class Rescue(BaseModel):
     age = Column(Integer)
     decription = Column(String(255))
     image_url = Column(Text)
+    gender = Column(String(60))
+    color = Column(String(60))
     location = Column(String(128))
     vet_evaluation = Column(String(255))
     status = Column(String(128))
