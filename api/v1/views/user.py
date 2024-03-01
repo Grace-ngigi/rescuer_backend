@@ -27,7 +27,6 @@ def register() -> str:
         abort(400, description="Missing password")
 
     existing_user = db.find_one(User, User.email== data['email'])
-    print(existing_user)
     if existing_user:
         return abort(400, description='Email already exists')
     
@@ -35,7 +34,6 @@ def register() -> str:
     user = User(email=data['email'],
                 phone=data['phone'],
                 password=hashed_password)
-    print(datetime.utcnow())
     user.created_at = datetime.utcnow()
     user.created_by = user.id
     db.new(user)
@@ -123,7 +121,6 @@ def retrieve_profile():
     if not user:
         abort(404, description="User Not Found")
 
-    print("Retrieved User:", user.__dict__)
     return jsonify(user.__custom_dict__()), 200
 
 @app_views.route("/profile", methods=['PUT'], strict_slashes=False)

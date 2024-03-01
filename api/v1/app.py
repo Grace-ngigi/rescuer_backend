@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 ''' entry point '''
+import os
+import sys
+
+project_root = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(project_root)
+
 from flask import Flask, make_response, jsonify
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from api.v1.views import app_views
