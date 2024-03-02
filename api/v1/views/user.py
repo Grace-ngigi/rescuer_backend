@@ -13,6 +13,15 @@ from datetime import datetime
 db = MysqlConfig()
 db.reload()
 
+@app_views.route("/verify/token", methods=['POST'], strict_slashes=False)
+@jwt_required()
+def verifyToken():
+    current_user = get_jwt_identity()
+    if not current_user:
+        abort(401, description="Unauthorised")
+    return jsonify(current_user['role'])
+
+
 @app_views.route('/register', methods=['POST'], strict_slashes=False)
 def register() -> str:
     ''' Register new User'''
