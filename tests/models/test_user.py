@@ -10,7 +10,7 @@ class TestUser(unittest.TestCase):
         self.session = self.mysql.get_session()
 
     def tearDown(self) -> None:
-        self.session.close()
+        self.mysql.close()
 
     def test_user(self):    
        user = User()
@@ -19,11 +19,11 @@ class TestUser(unittest.TestCase):
        user.phone = "345345"
        user.password = "bibia"
        user.role = "user"
-       self.session.add(user)
-       self.session.commit()
+       self.mysql.new(user)
+       self.mysql.save()
 
-        # fetc added user
-       existin_user = self.session.query(User).filter_by(email='kabiba@bib.com').first()
+        # fetch added user
+       existin_user = self.mysql.find_one(User, condition=User.email == 'kabiba@bib.com')
        print(existin_user)
     #    self.session.close()
 
